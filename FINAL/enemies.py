@@ -55,13 +55,28 @@ enemy_demon = {
 
     "attack": "2",
 
-    "description": """It's a skeleton. He's holding the keys to a boat!"""
+    "description": """It's a evil demon. He's holding the keys to a boat!"""
+}
+
+enemy_turtle = {
+    "id": "turtle",
+
+    "name": "'Evil' Turtle",
+
+    "health": "150",
+
+    "attack": "0",
+
+    "description": """It's an incredibly evil turtle. It may look friendly,
+    but behind those eyes you see the heart of a killer.
+    """
 }
 
 enemies = {
     "skeleton": enemy_skeleton,
     "pirate": enemy_pirate,
-    "crab": enemey,
-    "zombie": item_biscuits,
-    "demon": item_pen
+    "crab": enemy_crab,
+    "zombie": enemy_zombie,
+    "demon": enemy_demon,
+    "turtle": enemy_turtle
 }
