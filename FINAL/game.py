@@ -4,7 +4,8 @@ from map import rooms
 from player import *
 from items import *
 from text_parser import *
-
+from enemies import *
+import random
 
 
 def list_of_items(items):
@@ -22,7 +23,7 @@ def list_of_items(items):
 
     >>> list_of_items([item_money, item_handbook, item_laptop])
     'money, a student handbook, laptop'
-    
+
     """
 
     return_string = ""
