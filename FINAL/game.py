@@ -5,7 +5,9 @@ from player import *
 from items import *
 from text_parser import *
 from enemies import *
+
 import random
+random.seed()
 
 
 def list_of_items(items):
@@ -307,17 +309,28 @@ def execute_drop(item_id):
 
 
 def execute_examine(item_id):
-    """This function is used to display the description of the item specified by
-    item_id. If the item does not exist in the player's inventory, then this
-    function prints "You cannot examine that."
+    """This function is used to display the description of the item or enemy 
+    specified by item_id. If the item does not exist in the player's inventory,
+    or the enemy specified then this is not present in the room, this function
+    prints "You cannot examine that.".
     """
 
     global current_room
     global inventory
-    if item_id in inventory:
-        print(inventory[item_id]["description"])
+    item_found = False
+    for item in inventory:
+        if item_id == item["id"]:
+            item_found = True
+            current_room["items"].append(item)
+            inventory.remove(item)
+            print("You drop " + item["name"] + ".")
+            break
+
+    if item_found:
+        return True
     else:
-        print("You cannot examine that.")
+        print("You cannot drop that.")
+        return False
 
 
 def execute_swap(item1_id, item2_id):
@@ -359,6 +372,7 @@ def execute_save():
     global current_room
     global rooms
     global inventory
+    global health
 
     # Initialises an error flag.
     error = False
@@ -376,6 +390,15 @@ def execute_save():
             for item in rooms[room]["items"]:
                 file_save.write(item["id"] + "\n")
 
+    # Writes the ids of all of the items and the room they are in.
+    file_save.write("##Room Enemies\n")
+    for room in rooms:
+        if len(rooms[room]["enemies"]) > 0:
+            file_save.write("#" + room + "\n")
+            for enemy in rooms[room]["enemies"]:
+                file_save.write(enemy["id"] + "\n")
+                file_save.write(enemy["health"] + "\n")
+
     # Writes the ids of all of the items in the player's inventory.
     file_save.write("##Inventory Items\n")
     if len(inventory) > 0:
@@ -384,6 +407,10 @@ def execute_save():
 
     # Writes the id of the room the player is currently in.
     file_save.write("##Current Room\n")   
+    file_save.write(str(current_room["id"]) + "\n")
+
+    # Writes the player's health to the file.
+    file_save.write("##Current Health\n")   
     file_save.write(str(current_room["id"]) + "\n")
 
     # Closes the file.
@@ -415,9 +442,12 @@ def execute_load():
 
     # Initialises lists/strings for storing data from file.
     data_list = []
-    data_rooms = []
+    data_rooms = {}
+    data_items = []
+    data_enemies = []
     data_inventory = []
     data_current_room = ""
+    data_health = ""
     data_room_selected = ""
 
     # Initialises variable for tracking data processing stage.
@@ -440,7 +470,7 @@ def execute_load():
             data_stage += 1
         else:
             if data_stage == 1:
-                data_rooms.append(data)
+                data_items.append(data)
             elif data_stage == 2:
                 data_inventory.append(data)
             elif data_stage == 3:
@@ -474,6 +504,35 @@ def execute_load():
         print("There was an error while loading. It is recommended")
         print("to not save from this point onward. Enjoy the errors")
         print("this issue may create.")
+
+
+def execute_attack(enemy_id):
+    """This function is used to attack an enemy in the same room as the
+    player. It deals a random amout of damage between 0 and 8 (inclusive), 
+    and has a small chance of dealing 3 times that damage as a 'critical
+    hit'. This function will also print the amount of damage done to the 
+    enemy.
+    """
+
+    global current_room
+    enemy_found = False
+    for enemy in current_room["enemies"]:
+        if enemy_id == enemy["id"]:
+            enemy_found = True
+            damage = randint(0,6)
+            critical = randint(0,20)
+            if critical >= 18:
+                print("Critical hit! Damage x 3!")
+                damage = damage * 3
+            print("You deal " + str(damage) + " damage to the " + enemy["id"])
+            enemy["health"] = str(val(enemy["health"]) - damage)
+            break
+
+    if item_found:
+        return True
+    else:
+        print("You cannot attack that.")
+        return False
 
 
 def execute_command(command):
@@ -535,6 +594,13 @@ def execute_command(command):
             if response == "Y":
                 execute_load()
 
+        # "Attack" command handler
+        elif command[0] == "attack":
+            if len(command) > 1:
+                execute_attack(command[1])
+            else:
+                print("Attack what?")
+
         # "Quit" command handler
         elif command[0] == "quit":
             response = input("Are you sure you want to quit? Type 'Y' to quit.  > ")
@@ -570,6 +636,16 @@ def run_check_death_player():
         return True
 
 
+def run_check_death_enemy(enemy):
+    """This function will check if an enemy has run out of health and
+    will remove the enemy from the room. It returns True if the enemy is
+    on zero health, or False otherwise.
+    """
+
+    if enemy["health"] <= 0:
+        return True
+
+
 def run_checks(room):
     """This function is used to check to see if the player has fulfilled the
     conditions for any events to be activated, such as beating the game,
@@ -577,7 +653,7 @@ def run_checks(room):
     loop runs.
     """
 
-    #Runs the "Game Victory" check.
+    # Runs the "Game Victory" check.
     if run_check_victory(room):
         print("=================================================")
         print("VICTORY")
@@ -590,7 +666,7 @@ def run_checks(room):
         print("=================================================")
         quit()
 
-    #Runs the "Player Death" check.
+    # Runs the "Player Death" check.
     if run_check_death_player():
         print("=================================================")
         print("DEFEAT")
@@ -600,6 +676,12 @@ def run_checks(room):
         print("Thanks for playing!")
         print("=================================================")
         quit()
+
+    # Runs the "Enemy Death" check.
+    for enemy in current_room["enemies"]:
+        if run_check_death_enemy(enemy):
+            print("The " + enemy["name"] + " was defeated!")
+            current_room["enemies"].remove(enemy)
 
 
 def menu(exits, room_items, inv_items, room_enemies):
