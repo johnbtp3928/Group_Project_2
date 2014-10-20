@@ -1,0 +1,12 @@
+##Room Items
+#Reception
+biscuits
+laptop
+#Office
+handbook
+##Inventory Items
+id
+money
+pen
+##Current Room
+Office

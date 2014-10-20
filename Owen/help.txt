@@ -1,0 +1,42 @@
+=================================================
+GOAL OF THE GAME
+
+Gather all of the objects in the game and take them to the
+Reception area.
+
+=================================================
+COMMAND LIST
+
+GO <direction> / MOVE <direction> 
+Moves you to the room that is in the specified direction.
+
+TAKE <item>
+Adds an item from the room you are in into your inventory.
+
+DROP <item>
+Removes an item from your inventory, and places it in your
+current room.
+
+SWAP <item1> <item2>
+Takes <item1> from the room and puts it in your inventory, 
+while dropping <item2> from your inventory into the room.  
+
+EXAMINE <item>
+Displays a description of the item specified.
+
+HELP
+Displays this screen. Have you forgotten already?
+
+SAVE
+Saves your current progress in the game, allowing you to
+resume playing from the save point at any time by using
+the load command.
+
+LOAD
+Loads the data from your save file and uses it to resume
+the game at the point where you last saved.
+
+QUIT
+Closes the game.
+
+=================================================
