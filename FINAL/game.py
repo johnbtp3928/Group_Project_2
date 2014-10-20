@@ -167,7 +167,7 @@ def print_exit(direction, leads_to):
     print("GO " + direction.upper() + " to " + leads_to + ".")
 
 
-def print_menu(exits, room_items, inv_items):
+def print_menu(exits, room_items, inv_items, room_enemies):
     """This function displays the menu of available actions to the player. The
     argument exits is a dictionary of exits as exemplified in map.py. The
     arguments room_items and inv_items are the items lying around in the room
@@ -204,12 +204,16 @@ def print_menu(exits, room_items, inv_items):
         print_exit(direction, exit_leads_to(exits, direction))
 
     # Iterate over room items
-    #for part in room_items:
-    #    print("TAKE " + str(part["id"]).upper() + " to take " + part["name"] + ".")
+    for part in room_items:
+        print("TAKE " + str(part["id"]).upper() + " to take " + part["name"] + ".")
 
     # Iterate over inventory items
-    #for part in inv_items:
-    #    print("DROP " + str(part["id"]).upper() + " to drop " + part["name"] + ".")
+    for part in inv_items:
+        print("DROP " + str(part["id"]).upper() + " to drop " + part["name"] + ".")
+
+    #Iterate over room enemies.
+    for part in room_enemies:
+        print("ATTACK " + str(part["id"]).upper() + " to attack the " + part["name"] + ".")
     
     print("What do you want to do?")
 
@@ -240,9 +244,11 @@ def execute_go(direction):
     moving). Otherwise, it prints "You cannot go there."
     """
     global current_room
-    if is_valid_exit(current_room["exits"], direction):
+    if is_valid_exit(current_room["exits"], direction) and len(current_room["enemies"]) == 0:
         print("Moving to " + exit_leads_to(current_room["exits"], direction) + "...")
         current_room = move(current_room["exits"], direction) 
+    elif len(current_room["enemies"]) != 0:
+        print("You cannot move when there are enemies nearby!")
     else:
         print("You cannot go there.")
 
@@ -553,6 +559,17 @@ def run_check_victory(room):
         return True
 
 
+def run_check_death_player():
+    """This function will check if the player has run out of health and
+    has failed to complete the game. It returns True if the player is
+    on zero health, or False otherwise.
+    """
+
+    global health
+    if health <= 0:
+        return True
+
+
 def run_checks(room):
     """This function is used to check to see if the player has fulfilled the
     conditions for any events to be activated, such as beating the game,
@@ -573,8 +590,19 @@ def run_checks(room):
         print("=================================================")
         quit()
 
+    #Runs the "Player Death" check.
+    if run_check_death_player():
+        print("=================================================")
+        print("DEFEAT")
+        print("")
+        print("You have died.")
+        print("")
+        print("Thanks for playing!")
+        print("=================================================")
+        quit()
 
-def menu(exits, room_items, inv_items):
+
+def menu(exits, room_items, inv_items, room_enemies):
     """This function, given a dictionary of possible exits from a room, and a list
     of items found in the room and carried by the player, prints the menu of
     actions using print_menu() function. It then prompts the player to type an
@@ -583,7 +611,7 @@ def menu(exits, room_items, inv_items):
     """
 
     # Display menu
-    print_menu(exits, room_items, inv_items)
+    print_menu(exits, room_items, inv_items, room_enemies)
 
     # Read player's input
     user_input = input("> ")
@@ -620,7 +648,7 @@ def main():
         print_inventory_items(inventory)
 
         # Show the menu with possible actions and ask the player
-        command = menu(current_room["exits"], current_room["items"], inventory)
+        command = menu(current_room["exits"], current_room["items"], inventory, current_room["enemies"])
 
         # Execute the player's command
         execute_command(command)

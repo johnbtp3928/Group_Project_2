@@ -1,4 +1,5 @@
 from items import *
+from enemies import *
 
 room_reception = {
     "name": "Reception",
@@ -17,7 +18,7 @@ south and east. The exit is to the west.""",
 
     "items": [item_biscuits, item_handbook],
 
-    "enemies": []
+    "enemies": [enemy_crab]
 }
 
 room_robs = {
@@ -89,7 +90,6 @@ Queen's Buildings.""",
 
     "enemies": []
 }
-
 
 
 rooms = {
