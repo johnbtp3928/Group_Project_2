@@ -22,8 +22,9 @@ def list_of_items(items):
 
     >>> list_of_items([item_money, item_handbook, item_laptop])
     'money, a student handbook, laptop'
-
+    
     """
+
     return_string = ""
     
     for part in items:
