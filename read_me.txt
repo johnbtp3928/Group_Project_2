@@ -6,8 +6,8 @@ You can also copy and paste any code you have into it as well.
 
 Goals we've decided on:
 - Adding enemies [Owen]
-- "Deserted island" map and story (will wait to see if Chris has anything, otherwise we weill do this)
+- "Deserted island" map and story (will wait to see if Chris has anything, otherwise we weill do this) [Chris]
 - Sound effects/Music
 - Game timer [Joe]
 - Visual map
-- Using items
+- Using items [Chris ]
